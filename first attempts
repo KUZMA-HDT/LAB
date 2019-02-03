@@ -2,13 +2,21 @@
      mail:  vasya.dvoretsky@yandex.ru
      
 """
+"""  coded by Dvoretsky Vasily
+     mail:  vasya.dvoretsky@yandex.ru
+     
+"""
 """importing required libraries """
 import cv2           #library of computer vision
 import numpy as np   #library of math
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+#import matplotlib.tri as tri
+import matplotlib
 
-#PI = np.float32( 3,1415926535897932384626433832795)
+
 """importing the image"""
-img = cv2.imread('1.jpg',3)
+img = cv2.imread('circles0.jpg',3)
 #img = cv2.imread("1.jpg",3)
 
 
@@ -20,9 +28,11 @@ gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
      
 """Applying Hough algorithm to the image"""
-circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1,33,param1=2,param2=15,minRadius=33,maxRadius=37)
+circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, 1,33,param1=2,param2=15,minRadius=20,maxRadius=29)
 
 print( circles)
+
+circles_save = circles
 """A bit of  information for people without without telepathic abilities  XD
 #   circles is a three-dimensional array of ([[[x1, y1,r1]
                                                [x2, y2,r2]
@@ -45,6 +55,7 @@ print( circles)
 
 
 """
+
 for i in circles[0,:]:
     
     cv2.circle(img,(i[0],i[1]),i[2],(0,255,0),2)
@@ -55,122 +66,88 @@ cv2.imshow('circles1', img)
 
 original_array = circles
 or_a = original_array[0]
-#defining the parameters of the source array
-first, second,third  = np.shape(original_array)
-#printing found parameters with detailed description
-print("Parameters of source array ")
-print("first  =",first)
-print("second =",second)
-print("third  =",third)
-
-number_of_rows = np.int_(second*(second-1)/2)
-print("number_of_rows =",number_of_rows)
-#new_array = np.random.uniform(size=(number_of_rows ,1))
-new_array = np.empty([number_of_rows, 1],dtype=float)
 
 
-"""begin writing lenghth
-_______________________________________________________________________________
-____________________________________LLLL_______________________________________
-____________________________________LLLL_______________________________________
-____________________________________LLLL_______________________________________
-____________________________________LLLL_______________________________________
-____________________________________LLLL_______________________________________
-____________________________________LLLL_______________________________________
-____________________________________LLLL_______________________________________
-____________________________________LLLL_______________________________________
-____________________________________LLLLLLLLLLLLLLLLL__________________________
-_______________________________________________________________________________
-
-"""
-print("calculated lenght")
-k=0
-for i in range(second-1):
-        for j in range(1,second):
+def Lenght(i,datatype):     #datatype = int or float
+    
+    new_arrayLenght = np.empty([np.int_(np.shape(original_array)[1]*(np.shape(original_array)[1]-1)/2), 1],dtype=datatype)  # НО МОЖНО И float
+    k=0
+    for i in range(np.shape(original_array)[1]-1):
+        for j in range(1,np.shape(original_array)[1]):
             if j<i or j==i:
 #                print("пропускаем",i,j)
                 j=j+1
             else:
 #            print("берём",i,j)
-                new_array[k] = np.sqrt((or_a[i][0]- or_a[j][0])**2 + (or_a[i][1]- or_a[j][1])**2 )
+                new_arrayLenght[k] = np.sqrt((or_a[i][0]- or_a[j][0])**2 + (or_a[i][1]- or_a[j][1])**2 )
 #                print("берём",i,j,new_array[i])
                 k=k+1
                 j=j+1
         continue
-#    i=i+1
-   
-print(new_array)
-    
-"""finish writing lenghth___________________ """
+    return  new_arrayLenght
 
 
-"""begin writing angle
-_______________________________________________________________________________
-_________________________________________AAAAA_________________________________
-________________________________________AA___AA________________________________
-_______________________________________AA_____AA_______________________________
-______________________________________AA_______AA______________________________
-_____________________________________AA_________AA_____________________________
-____________________________________AAAAAAAAAAAAAAA____________________________
-___________________________________АА_____________АА___________________________
-__________________________________AA_______________AA__________________________
-_________________________________AA_________________AA_________________________
-_______________________________________________________________________________
-"""
-print("calculated angle")
-k1=0
-for i in range(second-1):
-        for j in range(1,second):
+def Alfa(i,datatype):    #datatype = int or float
+    new_arrayAlfa = np.empty([np.int_(np.shape(original_array)[1]*(np.shape(original_array)[1]-1)/2), 1],dtype=datatype)  # НО МОЖНО И float
+    k1=0
+    for i in range(np.shape(original_array)[1]-1):
+        for j in range(1,np.shape(original_array)[1]):
             if j<i or j==i:
 #                print("пропускаем",i,j)
                 j=j+1
             else:
 #            print("берём",i,j)
-#               
-                new_array[k1] = np.rad2deg(np.arctan((or_a[i][1]- or_a[j][1])/(or_a[i][0]- or_a[j][0])))
+                new_arrayAlfa[k1] = np.rad2deg(np.arctan((or_a[i][1]- or_a[j][1])/(or_a[i][0]- or_a[j][0])))
 #                print("берём",i,j,new_array[i])
-                k=k+1
+                k1=k1+1
                 j=j+1
         continue
-#    i=i+1
-   
-print(new_array)
-    
-"""finish writing langle___________________ """
+    return  new_arrayAlfa
 
-
-"""begin writing Betta
-_______________________________________________________________________________
-____________________________________BBBBBBBBBB_________________________________
-____________________________________BBB______BBB_______________________________
-____________________________________BBB_______BBB______________________________
-____________________________________BBB______BBB_______________________________
-____________________________________BBBBBBBBBB_________________________________
-____________________________________BBB______BBB_______________________________
-____________________________________BBB_______BBB______________________________
-____________________________________BBB______BBB_______________________________
-____________________________________BBBBBBBBBBB________________________________
-_______________________________________________________________________________
-"""
-print("calculated betta")
-k2=0
-for i in range(second-1):
-        for j in range(1,second):
+#___________________________________________________________________________________
+def Betta(i,datatype):   #datatype = int or float
+    new_arrayBetta = np.empty([np.int_(np.shape(original_array)[1]*(np.shape(original_array)[1]-1)/2), 1],dtype=datatype)  # НО МОЖНО И float
+    k2=0
+    for i in range(np.shape(original_array)[1]-1):
+        for j in range(1,np.shape(original_array)[1]):
             if j<i or j==i:
 #                print("пропускаем",i,j)
                 j=j+1
             else:
 #            print("берём",i,j)
-                new_array[k2] = or_a[i][1]+ ((or_a[i][1]- or_a[j][1])/(or_a[i][0]- or_a[j][0]))*or_a[i][0] 
+                new_arrayBetta[k2] = or_a[i][1]+ ((or_a[i][1]- or_a[j][1])/(or_a[i][0]- or_a[j][0]))*or_a[i][0] 
 #                print("берём",i,j,new_array[i])
-                k=k+1
+                k2=k2+1
                 j=j+1
         continue
-#    i=i+1
+    return  new_arrayBetta
    
-print(new_array)
-    
-"""finish writing betta___________________ """
+#    
+#print(Betta(or_a,float))
+#print()
+#print(Alfa(or_a,float))
+#print()
+#print(Lenght(or_a,float))
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+xs=[Lenght(or_a,float)]
+ys=[Alfa(or_a,float)]
+zs=[Betta(or_a,float)]
+
+
+ax.scatter(xs, ys, zs, c='r', marker='o')
+#ax.scatter(xt, yt, zt, c='b', marker='^')
+
+ax.set_xlabel('Длинна вектора (Length)')
+ax.set_ylabel('Угол наклона (Alfa)')
+ax.set_zlabel('Приращение (Betta)')
+
+plt.show()
+
+
+
 
 k = cv2.waitKey(0)
 if k == 27:
